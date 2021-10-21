@@ -1,3 +1,4 @@
+import { GetStaticPaths, GetStaticProps } from "next";
 import { CSSProperties } from "react";
 
 const containerStyle: CSSProperties = {
@@ -18,15 +19,28 @@ const headingStyle: CSSProperties = {
   background: "linear-gradient(yellow, red)",
   backgroundClip: "text",
   WebkitBackgroundClip: "text",
-  color: "transparent"
+  color: "transparent",
 };
-export default function Home() {
+export default function Home(
+  props: ReturnType<typeof getStaticProps>["props"]
+) {
   return (
-    <><head>
-      <title>Next.js</title>
-    </head>
-    <main style={containerStyle}>
-      <h1 style={headingStyle}>Hello Next.js</h1>
-    </main></>
+    <>
+      <head>
+        <title>Next.js</title>
+      </head>
+      <main style={containerStyle}>
+        <h1 style={headingStyle}>Hello {props.id ?? "Next.js"}</h1>
+      </main>
+    </>
   );
 }
+
+export const getStaticProps = ({ params: { id } }) => ({
+  props: { id },
+});
+
+export const getStaticPaths: GetStaticPaths = async () => ({
+  paths: [{ params: { name: "world" } }],
+  fallback: "blocking",
+});
