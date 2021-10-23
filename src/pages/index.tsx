@@ -12,7 +12,7 @@ export default function Home({ articles }: Props) {
     <main className={css.main}>
       <ul>
         {articles.map((article) => (
-          <li>
+          <li style={{listStyle: "none", fontSize: "2em"}}>
             <Link href={`/${article.slug}`}>{article.title}</Link>
           </li>
         ))}
