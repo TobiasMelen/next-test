@@ -19,10 +19,11 @@ function MyApp({ Component, pageProps }: Props) {
               data-domain="next-test-one-wheat.vercel.app"
               src="https://plausible.io/js/plausible.js"
             ></script>
-            <script>
-              window.plausible = window.plausible || function()
-              {(window.plausible.q = window.plausible.q || []).push(arguments)}
-            </script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }`,
+              }}
+            />
           </>
         )}
       </head>
