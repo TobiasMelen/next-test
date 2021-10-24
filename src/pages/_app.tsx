@@ -5,17 +5,17 @@ type Props = {
   pageProps: { title?: string };
 };
 
-const url = process.env.VERCEL_URL;
+const productionPublish = process.env.VERCEL_ENV === "production";
 
 function MyApp({ Component, pageProps }: Props) {
   return (
     <>
       <head>
         <title>{pageProps.title}</title>
-        {url && (
+        {productionPublish && (
           <script
             defer
-            data-domain={url}
+            data-domain="next-test-one-wheat.vercel.app"
             src="https://plausible.io/js/plausible.js"
           ></script>
         )}
