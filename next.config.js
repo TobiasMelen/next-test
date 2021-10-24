@@ -8,4 +8,7 @@ module.exports = withPreact({
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    domains: ["images.ctfassets.net"],
+  },
 });

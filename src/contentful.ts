@@ -13,5 +13,14 @@ export const createContentfulClient = (preview = false) => {
   const accessToken = preview
     ? requiredEnvVar("CONTENTFUL_PREVIEW_TOKEN")
     : requiredEnvVar("CONTENTFUL_TOKEN");
-  return createClient({space, accessToken});
+  return createClient({ space, accessToken });
+};
+
+export type ImageProps = ReturnType<typeof imageProps>;
+export const imageProps = <TAsset extends Asset>(asset?: TAsset) => {
+  const url = asset?.fields.file?.url?.substr(1);
+  return {
+    src: `https:${url}`,
+    alt: asset?.fields.title ?? "",
+  };
 };

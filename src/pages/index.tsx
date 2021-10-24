@@ -1,10 +1,16 @@
 import { GetStaticProps } from "next";
 import Link from "next/link";
-import { ContentfulArticle, createContentfulClient } from "../contentful";
+import {
+  ContentfulArticle,
+  createContentfulClient,
+  imageProps,
+  ImageProps,
+} from "../contentful";
 import css from "../styles/main.module.css";
+import Image from "next/image";
 
 type Props = {
-  articles: { title: string; image?: string; slug: string }[];
+  articles: { title: string; image?: ImageProps; slug: string }[];
 };
 
 export default function Home({ articles }: Props) {
@@ -12,8 +18,20 @@ export default function Home({ articles }: Props) {
     <main className={css.main}>
       <ul>
         {articles.map((article) => (
-          <li style={{listStyle: "none", fontSize: "2em"}}>
-            <Link href={`/${article.slug}`}>{article.title}</Link>
+          <li style={{ listStyle: "none", fontSize: "2em" }}>
+            <Link href={`/${article.slug}`}>
+              <a>
+                {article.image && (
+                  <Image
+                    {...article.image}
+                    width={200}
+                    height={200}
+                    objectFit="cover"
+                  />
+                )}
+                {article.title}
+              </a>
+            </Link>
           </li>
         ))}
       </ul>
@@ -30,7 +48,7 @@ export const getStaticProps: GetStaticProps<Props, {}> = async () => {
   const props: Props = {
     articles: articles.items?.map((article) => ({
       title: article.fields.title,
-      image: article.fields.image?.fields.file?.url,
+      image: imageProps(article.fields.image),
       slug: article.fields.slug,
     })),
   };

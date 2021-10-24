@@ -37,5 +37,5 @@ export const getStaticProps: GetStaticProps<Props, { slug: string }> = async ({
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: ["/owls"],
-  fallback: "blocking",
+  fallback: true,
 });
