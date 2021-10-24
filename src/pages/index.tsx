@@ -20,7 +20,11 @@ export default function Home({ articles }: Props) {
         {articles.map((article) => (
           <li style={{ listStyle: "none", fontSize: "2em" }}>
             <Link href={`/${article.slug}`}>
-              <a>
+              <a
+                onClick={() =>
+                  window.plausible("ArticleView", { type: article.title })
+                }
+              >
                 {article.image && (
                   <Image
                     {...article.image}
