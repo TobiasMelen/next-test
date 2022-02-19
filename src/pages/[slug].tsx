@@ -1,14 +1,40 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { ContentfulArticle, createContentfulClient } from "../contentful";
+import {
+  ContentfulArticle,
+  createContentfulClient,
+  ImageProps,
+  imageProps,
+} from "../contentful";
+import css from "../styles/main.module.css";
 
 type Props = {
   title: string;
-  image?: string;
+  image?: ImageProps;
   text?: string;
 };
 
-export default function Home(props: Props) {
-  return <main>{props.title}</main>;
+export default function Article(props: Props) {
+  return (
+    <article style={{ marginBottom: "2em" }}>
+      {props.image && (
+        <img
+          {...props.image}
+          style={{
+            display: "block",
+            height: "50vh",
+            width: "900px",
+            objectFit: "cover",
+            maxWidth: "100%",
+            margin: "0 auto",
+          }}
+        />
+      )}
+      <section className={css.textBlock}>
+        <h2 className={css.heading}>{props.title}</h2>
+        <p>{props.text}</p>
+      </section>
+    </article>
+  );
 }
 
 export const getStaticProps: GetStaticProps<Props, { slug: string }> = async ({
@@ -30,7 +56,7 @@ export const getStaticProps: GetStaticProps<Props, { slug: string }> = async ({
     props: {
       title: article.title,
       text: article.text,
-      image: article.image?.fields.file.url,
+      image: imageProps(article.image),
     },
   };
 };

@@ -1,5 +1,7 @@
 import { GetStaticProps } from "next";
+import Head from "next/head";
 import Link from "next/link";
+import ContentfulImage from "../components/ContentfulImage";
 import {
   ContentfulArticle,
   createContentfulClient,
@@ -7,10 +9,16 @@ import {
   ImageProps,
 } from "../contentful";
 import css from "../styles/main.module.css";
-import Image from "next/image";
+import Article from "./[slug]";
 
 type Props = {
-  articles: { title: string; image?: ImageProps; slug: string }[];
+  title: string;
+  articles: {
+    title: string;
+    image?: ImageProps;
+    slug: string;
+    text?: string;
+  }[];
 };
 
 export default function Home({ articles }: Props) {
@@ -18,22 +26,16 @@ export default function Home({ articles }: Props) {
     <main className={css.main}>
       <ul>
         {articles.map((article) => (
-          <li style={{ listStyle: "none", fontSize: "2em" }}>
+          <li
+            style={{
+              listStyle: "none",
+              margin: "2em 0",
+              paddingBottom: "2em",
+            }}
+          >
             <Link href={`/${article.slug}`}>
-              <a
-                onClick={() =>
-                  window.plausible("ArticleView", { type: article.title })
-                }
-              >
-                {article.image && (
-                  <Image
-                    {...article.image}
-                    width={200}
-                    height={200}
-                    objectFit="cover"
-                  />
-                )}
-                {article.title}
+              <a>
+                <Article {...article} />
               </a>
             </Link>
           </li>
@@ -47,11 +49,13 @@ export const getStaticProps: GetStaticProps<Props, {}> = async () => {
   const client = createContentfulClient(false);
   const articles = await client.getEntries<ContentfulArticle>({
     content_type: "article",
-    order: "sys.updatedAt",
+    order: "sys.createdAt",
   });
   const props: Props = {
+    title: "My favourite animals",
     articles: articles.items?.map((article) => ({
       title: article.fields.title,
+      text: article.fields.text?.split(/\r?\n/)[0],
       image: imageProps(article.fields.image),
       slug: article.fields.slug,
     })),
