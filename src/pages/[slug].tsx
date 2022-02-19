@@ -19,6 +19,7 @@ export default function Article(props: Props) {
       {props.image && (
         <img
           {...props.image}
+          src={props.image.src + "?fm=avif&w=1600"}
           style={{
             display: "block",
             height: "50vh",
