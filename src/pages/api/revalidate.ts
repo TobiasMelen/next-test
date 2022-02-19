@@ -15,6 +15,7 @@ const revalidate: NextApiHandler = async (_, res) => {
       ).items.map((s) => `/${s.fields.slug}`),
     ].map(res.unstable_revalidate.bind(res))
   );
+  return res.send("");
 };
 
 export default revalidate;
