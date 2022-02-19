@@ -40,8 +40,9 @@ export default function Article(props: Props) {
 
 export const getStaticProps: GetStaticProps<Props, { slug: string }> = async ({
   params: { slug } = {},
+  preview = false,
 }) => {
-  const client = createContentfulClient(false);
+  const client = createContentfulClient(preview);
   const article =
     slug != null &&
     (
@@ -55,6 +56,7 @@ export const getStaticProps: GetStaticProps<Props, { slug: string }> = async ({
   }
   return {
     props: {
+      preview,
       title: article.title,
       text: article.text,
       image: imageProps(article.image),

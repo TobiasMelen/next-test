@@ -1,5 +1,5 @@
 import { Asset, createClient } from "contentful";
-import { requiredEnvVar, throwInlineError } from "./utils";
+import { requiredEnvVar } from "./utils";
 
 export type ContentfulArticle = {
   title: string;
@@ -13,7 +13,11 @@ export const createContentfulClient = (preview = false) => {
   const accessToken = preview
     ? requiredEnvVar("CONTENTFUL_PREVIEW_TOKEN")
     : requiredEnvVar("CONTENTFUL_TOKEN");
-  return createClient({ space, accessToken });
+  return createClient({
+    space,
+    accessToken,
+    host: preview ? "preview.contentful.com" : undefined,
+  });
 };
 
 export type ImageProps = ReturnType<typeof imageProps>;

@@ -8,8 +8,6 @@ import {
   imageProps,
   ImageProps,
 } from "../contentful";
-import css from "../styles/main.module.css";
-import Article from "./[slug]";
 
 type Props = {
   title: string;
@@ -97,22 +95,26 @@ export default function Home({ articles }: Props) {
   );
 }
 
-const fontColors = ["hotpink", "DeepSkyBlue", "white"];
+const fontColors = ["hotpink", "DeepSkyBlue"];
 
-export const getStaticProps: GetStaticProps<Props, {}> = async () => {
-  const client = createContentfulClient(false);
+export const getStaticProps: GetStaticProps<Props, {}> = async ({
+  preview = false,
+}) => {
+  const client = createContentfulClient(preview);
   const articles = await client.getEntries<ContentfulArticle>({
     content_type: "article",
     order: "-sys.updatedAt",
   });
-  const props: Props = {
-    title: "My favourite animals",
-    articles: articles.items?.map((article) => ({
-      title: article.fields.title,
-      text: article.fields.text?.split(/\r?\n/)[0],
-      image: imageProps(article.fields.image),
-      slug: article.fields.slug,
-    })),
+  return {
+    props: {
+      preview,
+      title: "My favourite animals",
+      articles: articles.items?.map((article) => ({
+        title: article.fields.title,
+        text: article.fields.text?.split(/\r?\n/)[0],
+        image: imageProps(article.fields.image),
+        slug: article.fields.slug,
+      })),
+    },
   };
-  return { props };
 };
