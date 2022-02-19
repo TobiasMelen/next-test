@@ -22,7 +22,7 @@ export const imageProps = <TAsset extends Asset>(asset?: TAsset) => {
   return {
     height: asset?.fields.file.details.image?.height,
     width: asset?.fields.file.details.image?.width,
-    src: `https:${url}`,
+    src: `https:/${url}`,
     alt: asset?.fields.title ?? "",
   };
 };
