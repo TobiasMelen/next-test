@@ -12,7 +12,7 @@ const revalidate: NextApiHandler = async (_, res) => {
         await contentfulClient.getEntries<ContentfulArticle>({
           content_type: "article",
         })
-      ).items.map((s) => s.fields.slug),
+      ).items.map((s) => `/${s.fields.slug}`),
     ].map(res.unstable_revalidate.bind(res))
   );
 };
