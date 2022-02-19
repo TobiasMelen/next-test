@@ -23,19 +23,71 @@ type Props = {
 
 export default function Home({ articles }: Props) {
   return (
-    <main className={css.main}>
-      <ul>
-        {articles.map((article) => (
+    <main>
+      <ul
+        style={{
+          padding: 0,
+          margin: 0,
+          width: "100vw",
+          height: "100vh",
+          overflowX: "auto",
+          scrollSnapType: "y mandatory",
+        }}
+      >
+        {articles.map((article, index) => (
           <li
             style={{
+              position: "sticky",
+              left: 0,
+              top: 0,
+              zIndex: index + 1,
+              padding: 0,
+              margin: 0,
               listStyle: "none",
-              margin: "2em 0",
-              paddingBottom: "2em",
+              height: "100vh",
+              width: "100vw",
+              flexShrink: 0,
+              scrollSnapAlign: "center",
+              scrollSnapStop: "always",
             }}
           >
             <Link href={`/${article.slug}`}>
-              <a>
-                <Article {...article} />
+              <a
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  justifyContent: `flex-${index % 2 === 0 ? "start" : "end"}`,
+                  alignItems: "flex-end",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <h2
+                  style={{
+                    margin: "0.25em",
+                    zIndex: 2,
+                    color: fontColors[index % fontColors.length],
+                    WebkitTextStroke: "6px black",
+                    fontSize: "8em",
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    fontStyle: "italic",
+                    letterSpacing: 1.1,
+                  }}
+                >
+                  {article.title}
+                </h2>
+                <img
+                  {...article.image}
+                  src={`${article.image?.src}?fm=webp&w=1500`}
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
               </a>
             </Link>
           </li>
@@ -45,11 +97,13 @@ export default function Home({ articles }: Props) {
   );
 }
 
+const fontColors = ["hotpink", "DeepSkyBlue", "white"];
+
 export const getStaticProps: GetStaticProps<Props, {}> = async () => {
   const client = createContentfulClient(false);
   const articles = await client.getEntries<ContentfulArticle>({
     content_type: "article",
-    order: "sys.createdAt",
+    order: "-sys.updatedAt",
   });
   const props: Props = {
     title: "My favourite animals",
