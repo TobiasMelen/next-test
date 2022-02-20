@@ -34,6 +34,7 @@ export default function Home({ articles }: Props) {
       >
         {articles.map((article, index) => (
           <li
+            key={article.slug}
             style={{
               position: "sticky",
               left: 0,
@@ -100,21 +101,25 @@ const fontColors = ["hotpink", "DeepSkyBlue"];
 export const getStaticProps: GetStaticProps<Props, {}> = async ({
   preview = false,
 }) => {
+  return {
+    props: {
+      preview,
+      title: "My favourite animals",
+      articles: await getContentfulArticles(preview),
+    },
+  };
+};
+
+const getContentfulArticles = async (preview: boolean) => {
   const client = createContentfulClient(preview);
   const articles = await client.getEntries<ContentfulArticle>({
     content_type: "article",
     order: "-sys.updatedAt",
   });
-  return {
-    props: {
-      preview,
-      title: "My favourite animals",
-      articles: articles.items?.map((article) => ({
-        title: article.fields.title,
-        text: article.fields.text?.split(/\r?\n/)[0],
-        image: imageProps(article.fields.image),
-        slug: article.fields.slug,
-      })),
-    },
-  };
+  return articles.items?.map((article) => ({
+    title: article.fields.title,
+    text: article.fields.text?.split(/\r?\n/)[0],
+    image: imageProps(article.fields.image),
+    slug: article.fields.slug,
+  }));
 };
