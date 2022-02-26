@@ -56,9 +56,10 @@ export default function Home({ articles }: Props) {
         margin: 0,
         width: "100vw",
         height: "100vh",
+        maxHeight: "-webkit-fill-available",
         overflowX: "auto",
         scrollSnapType: "y mandatory",
-        scrollbarWidth: "none"
+        scrollbarWidth: "none",
       }}
     >
       <div
@@ -94,6 +95,7 @@ export default function Home({ articles }: Props) {
               margin: 0,
               listStyle: "none",
               height: "100vh",
+              maxHeight: "-webkit-fill-available",
               width: "100vw",
               flexShrink: 0,
               // scrollSnapAlign: "center",
