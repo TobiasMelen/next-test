@@ -1,6 +1,6 @@
 import { AppInitialProps } from "next/app";
 import Head from "next/head";
-import { lazy } from "react";
+import dynamic from "next/dynamic";
 import "../styles/globals.css";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   pageProps: { title?: string; preview?: boolean };
 };
 
-const PreviewBanner = lazy(() => import("../components/PreviewBanner"));
+const PreviewBanner = dynamic(() => import("../components/PreviewBanner"));
 
 function MyApp({ Component, pageProps }: Props) {
   return (
