@@ -1,3 +1,4 @@
+import { AppInitialProps } from "next/app";
 import Head from "next/head";
 import { lazy } from "react";
 import "../styles/globals.css";

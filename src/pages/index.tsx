@@ -1,8 +1,7 @@
+import { css } from "goober";
 import { GetStaticProps } from "next";
-import Head from "next/head";
 import Link from "next/link";
 import { Fragment, useEffect, useRef, useState } from "react";
-import ContentfulImage from "../components/ContentfulImage";
 import {
   ContentfulArticle,
   createContentfulClient,
@@ -21,128 +20,196 @@ type Props = {
 };
 
 export default function Home({ articles }: Props) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentScreen, setCurrentScreen] = useState("");
   const listRef = useRef<HTMLUListElement>(null);
+
+  //Keep track of focused screen
   useEffect(() => {
-    if (!listRef.current) {
-      return;
-    }
-    const children = listRef.current.querySelectorAll("[data-screen]");
-    console.log(children);
     const observer = new IntersectionObserver(
       (e) => {
-        const intersectingIndex = e
+        const intersectingScreen = e
           .find((entry) => entry.isIntersecting)
           ?.target.getAttribute("data-screen");
-        console.log(...e);
-        setCurrentIndex((index) =>
-          typeof intersectingIndex === "string"
-            ? parseInt(intersectingIndex)
-            : index - 1
-        );
+        intersectingScreen && setCurrentScreen(intersectingScreen);
       },
-      { threshold: 0.5, root: listRef.current, rootMargin: "-10%" }
+      { threshold: 0.5, root: listRef.current, rootMargin: "50% 0% -50% 0%" }
     );
-    children.forEach(observer.observe.bind(observer));
+    const children = listRef.current?.querySelectorAll("[data-screen]") ?? [];
+    children.forEach(observer?.observe.bind(observer));
     return () => {
-      observer.disconnect();
+      children.forEach(observer?.unobserve.bind(observer));
     };
-  }, []);
+  }, [articles]);
+
+  //Loop scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver((e) => {
+      console.log(e);
+      const marker = e
+        .find((entry) => entry.isIntersecting)
+        ?.target.getAttribute("data-scrollmarker");
+      switch (marker) {
+        case "top":
+          listRef.current
+            ?.querySelectorAll(
+              `[data-screen="${articles[articles.length - 1]?.slug}"]`
+            )?.[1]
+            .scrollIntoView();
+          break;
+        case "bottom": {
+          listRef.current
+            ?.querySelectorAll(`[data-screen="${articles[0]?.slug}"]`)?.[0]
+            .scrollIntoView();
+          break;
+        }
+      }
+    });
+    listRef.current
+      ?.querySelectorAll("[data-scrollmarker]")
+      .forEach(observer.observe.bind(observer));
+    return () => observer.disconnect();
+  }, [articles]);
+
+  //Scroll to "first" real article on load
+  useEffect(() => {
+    const [firstArticle] = articles;
+    firstArticle &&
+      listRef.current &&
+      listRef.current
+        .querySelector(`[data-screen="${firstArticle.slug}"]`)
+        ?.scrollIntoView();
+  }, [articles]);
+
   return (
     <main
       ref={listRef}
-      style={{
-        padding: 0,
-        margin: 0,
-        width: "100vw",
-        height: "100vh",
-        maxHeight: "-webkit-fill-available",
-        overflowX: "auto",
-        scrollSnapType: "y mandatory",
-        scrollbarWidth: "none",
-      }}
+      className={css`
+        padding: 0;
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+        max-height: -webkit-fill-available;
+        overflow-x: auto;
+        scroll-snap-type: y mandatory;
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+          -webkit-appearance: none;
+          width: 0;
+          height: 0;
+        }
+      `}
     >
       <div
-        style={{
-          position: "absolute",
-          right: 0,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          zIndex: 1,
-        }}
+        className={css`
+          position: absolute;
+          right: 0;
+          padding: 2vmin;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          z-index: 1;
+        `}
       >
-        <h2 style={{ color: "white" }}>{currentIndex}</h2>
+        {articles.map(({ slug }, index) => (
+          <a
+            key={slug + index}
+            className={css`
+              margin: 2vmin 0;
+              padding: 0.4vmin;
+              background-color: black;
+              border-radius: 50%;
+              transition: box-shadow 500ms;
+              box-shadow: ${currentScreen === slug
+                ? `0 0 0 .9vmin deepskyblue`
+                : `none`};
+            `}
+            onClick={() =>
+              listRef.current
+                ?.querySelector(`[data-screen="${slug}"]`)
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          />
+        ))}
       </div>
-      {articles.map((article, index) => (
-        <Fragment key={article.slug}>
-          <div
-            style={{
-              height: 0,
-              scrollSnapStop: "always",
-              scrollSnapAlign: "start",
-            }}
-          ></div>
-          <div
-            data-screen={index}
-            style={{
-              position: "sticky",
-              left: 0,
-              top: 0,
-              //zIndex: index + 1,
-              padding: 0,
-              margin: 0,
-              listStyle: "none",
-              height: "100vh",
-              maxHeight: "-webkit-fill-available",
-              width: "100vw",
-              flexShrink: 0,
-              // scrollSnapAlign: "center",
-              // scrollSnapStop: "always",
-            }}
-          >
-            <Link href={`/${article.slug}`}>
-              <a
-                style={{
-                  display: "flex",
-                  justifyContent: `flex-${index % 2 === 0 ? "start" : "end"}`,
-                  alignItems: "flex-end",
-                  width: "100%",
-                  height: "100%",
-                }}
+      <div style={{ height: 0 }} data-scrollmarker={"top"} />
+      {[articles[articles.length - 1]]
+        .concat(articles)
+        .concat(articles[0])
+        .map((article, index) => {
+          return (
+            <Fragment key={article.slug + index}>
+              <div
+                data-screen={article.slug}
+                className={css({
+                  height: 0,
+                  scrollSnapStop: "always",
+                  scrollSnapAlign: "start",
+                })}
+              ></div>
+              <div
+                className={css({
+                  position: "sticky",
+                  left: 0,
+                  top: 0,
+                  //zIndex: index + 1,
+                  padding: 0,
+                  margin: 0,
+                  listStyle: "none",
+                  height: "100vh",
+                  maxHeight: "-webkit-fill-available",
+                  width: "100vw",
+                  flexShrink: 0,
+                  // scrollSnapAlign: "center",
+                  // scrollSnapStop: "always",
+                })}
               >
-                <h2
-                  style={{
-                    margin: "0.25em",
-                    zIndex: 2,
-                    color: fontColors[index % fontColors.length],
-                    WebkitTextStroke: ".6vmin black",
-                    fontSize: "13vmin",
-                    fontWeight: 900,
-                    textTransform: "uppercase",
-                    fontStyle: "italic",
-                    letterSpacing: 1.1,
-                  }}
-                >
-                  {article.title}
-                </h2>
-                <img
-                  {...article.image}
-                  src={`${article.image?.src}?fm=webp&w=1500`}
-                  style={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              </a>
-            </Link>
-          </div>
-        </Fragment>
-      ))}
+                <Link href={`/${article.slug}`}>
+                  <a
+                    className={css({
+                      display: "flex",
+                      justifyContent: `flex-${
+                        index % 2 === 0 ? "start" : "end"
+                      }`,
+                      alignItems: "flex-end",
+                      width: "100%",
+                      height: "100%",
+                    })}
+                  >
+                    <h2
+                      className={css({
+                        margin: "0.25em",
+                        zIndex: 2,
+                        color: fontColors[index % fontColors.length],
+                        WebkitTextStroke: ".6vmin black",
+                        fontSize: "13vmin",
+                        fontWeight: 900,
+                        textTransform: "uppercase",
+                        fontStyle: "italic",
+                        letterSpacing: "1.1",
+                      })}
+                    >
+                      {article.title}
+                    </h2>
+                    <img
+                      {...article.image}
+                      src={`${article.image?.src}?fm=webp&w=1200`}
+                      loading="lazy"
+                      className={css({
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      })}
+                    />
+                  </a>
+                </Link>
+              </div>
+            </Fragment>
+          );
+        })}
+      <div style={{ height: 0 }} data-scrollmarker={"bottom"} />
     </main>
   );
 }
