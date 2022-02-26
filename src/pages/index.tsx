@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { Fragment, useEffect, useRef, useState } from "react";
 import ContentfulImage from "../components/ContentfulImage";
 import {
   ContentfulArticle,
@@ -20,40 +21,88 @@ type Props = {
 };
 
 export default function Home({ articles }: Props) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const listRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    if (!listRef.current) {
+      return;
+    }
+    const children = listRef.current.querySelectorAll("[data-screen]");
+    console.log(children);
+    const observer = new IntersectionObserver(
+      (e) => {
+        const intersectingIndex = e
+          .find((entry) => entry.isIntersecting)
+          ?.target.getAttribute("data-screen");
+        console.log(...e);
+        setCurrentIndex((index) =>
+          typeof intersectingIndex === "string"
+            ? parseInt(intersectingIndex)
+            : index - 1
+        );
+      },
+      { threshold: 0.5, root: listRef.current, rootMargin: "-10%" }
+    );
+    children.forEach(observer.observe.bind(observer));
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
   return (
-    <main>
-      <ul
+    <main
+      ref={listRef}
+      style={{
+        padding: 0,
+        margin: 0,
+        width: "100vw",
+        height: "100vh",
+        overflowX: "auto",
+        scrollSnapType: "y mandatory",
+        scrollbarWidth: "none"
+      }}
+    >
+      <div
         style={{
-          padding: 0,
-          margin: 0,
-          width: "100vw",
-          height: "100vh",
-          overflowX: "auto",
-          scrollSnapType: "y mandatory",
+          position: "absolute",
+          right: 0,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          zIndex: 1,
         }}
       >
-        {articles.map((article, index) => (
-          <li
-            key={article.slug}
+        <h2 style={{ color: "white" }}>{currentIndex}</h2>
+      </div>
+      {articles.map((article, index) => (
+        <Fragment key={article.slug}>
+          <div
+            style={{
+              height: 0,
+              scrollSnapStop: "always",
+              scrollSnapAlign: "start",
+            }}
+          ></div>
+          <div
+            data-screen={index}
             style={{
               position: "sticky",
               left: 0,
               top: 0,
-              zIndex: index + 1,
+              //zIndex: index + 1,
               padding: 0,
               margin: 0,
               listStyle: "none",
               height: "100vh",
               width: "100vw",
               flexShrink: 0,
-              scrollSnapAlign: "center",
-              scrollSnapStop: "always",
+              // scrollSnapAlign: "center",
+              // scrollSnapStop: "always",
             }}
           >
             <Link href={`/${article.slug}`}>
               <a
                 style={{
-                  position: "relative",
                   display: "flex",
                   justifyContent: `flex-${index % 2 === 0 ? "start" : "end"}`,
                   alignItems: "flex-end",
@@ -66,8 +115,8 @@ export default function Home({ articles }: Props) {
                     margin: "0.25em",
                     zIndex: 2,
                     color: fontColors[index % fontColors.length],
-                    WebkitTextStroke: "6px black",
-                    fontSize: "8em",
+                    WebkitTextStroke: ".6vmin black",
+                    fontSize: "13vmin",
                     fontWeight: 900,
                     textTransform: "uppercase",
                     fontStyle: "italic",
@@ -89,9 +138,9 @@ export default function Home({ articles }: Props) {
                 />
               </a>
             </Link>
-          </li>
-        ))}
-      </ul>
+          </div>
+        </Fragment>
+      ))}
     </main>
   );
 }
