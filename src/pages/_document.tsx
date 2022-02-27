@@ -1,12 +1,7 @@
-import {
-  Html,
-  Head,
-  Main,
-  NextScript
-} from "next/document";
+import { Html, Head, Main, NextScript } from "next/document";
 import { extractCss } from "goober";
 
-export default function Document({ css }: { css: string }) {
+export default function Document({ css } = { css: "" }) {
   <Html>
     <Head>
       <style
