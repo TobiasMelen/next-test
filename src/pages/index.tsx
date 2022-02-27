@@ -109,6 +109,7 @@ export default function Home({ articles }: Props) {
           flex-direction: column;
           justify-content: center;
           z-index: 1;
+          overscroll-behavior-block: contain;
         `}
       >
         {articles.map(({ slug }, index) => (
@@ -147,73 +148,62 @@ export default function Home({ articles }: Props) {
                   scrollSnapAlign: "start",
                 })}
               ></div>
-              <div
-                className={css({
-                  position: "sticky",
-                  left: 0,
-                  top: 0,
-                  //zIndex: index + 1,
-                  padding: 0,
-                  margin: 0,
-                  listStyle: "none",
-                  height: "100vh",
-                  maxHeight: "-webkit-fill-available",
-                  width: "100vw",
-                  flexShrink: 0,
-                  // scrollSnapAlign: "center",
-                  // scrollSnapStop: "always",
-                })}
-              >
-                <Link href={`/${article.slug}`}>
-                  <a
+              <Link href={`/${article.slug}`}>
+                <a
+                  className={css({
+                    position: "sticky",
+                    left: 0,
+                    top: 0,
+                    padding: 0,
+                    margin: 0,
+                    listStyle: "none",
+                    height: "100vh",
+                    maxHeight: "-webkit-fill-available",
+                    width: "100vw",
+                    flexShrink: 0,
+                    display: "flex",
+                    justifyContent: `flex-${index % 2 === 0 ? "start" : "end"}`,
+                    alignItems: "flex-end",
+                    background: "#DDD",
+                  })}
+                >
+                  <h2
                     className={css({
-                      display: "flex",
-                      justifyContent: `flex-${
-                        index % 2 === 0 ? "start" : "end"
-                      }`,
-                      alignItems: "flex-end",
-                      width: "100%",
-                      height: "100%",
+                      margin: "0.25em",
+                      zIndex: 2,
+                      color: fontColors[index % fontColors.length],
+                      WebkitTextStroke: ".6vmin black",
+                      fontSize: "13vmin",
+                      fontWeight: 900,
+                      textTransform: "uppercase",
+                      fontStyle: "italic",
+                      letterSpacing: "2px",
+                      opacity: article.slug === currentScreen ? 1 : 0,
+                      transform: `translateX(${
+                        article.slug === currentScreen
+                          ? "0"
+                          : `${index % 2 === 0 ? "-" : ""}75%`
+                      })`,
+                      transition: "transform 350ms ease-out, opacity 350ms",
+                      transitionDelay: "175ms",
                     })}
                   >
-                    <h2
-                      className={css({
-                        margin: "0.25em",
-                        zIndex: 2,
-                        color: fontColors[index % fontColors.length],
-                        WebkitTextStroke: ".6vmin black",
-                        fontSize: "13vmin",
-                        fontWeight: 900,
-                        textTransform: "uppercase",
-                        fontStyle: "italic",
-                        letterSpacing: "2px",
-                        opacity: article.slug === currentScreen ? 1 : 0, 
-                        transform: `translateX(${
-                          article.slug === currentScreen
-                            ? "0"
-                            : `${index % 2 === 0 ? "-" : ""}75%`
-                        })`,
-                        transition: "transform 350ms ease-out, opacity 350ms",
-                        transitionDelay: "175ms",
-                      })}
-                    >
-                      {article.title}
-                    </h2>
-                    <img
-                      {...article.image}
-                      src={`${article.image?.src}?fm=webp&w=1200`}
-                      loading="lazy"
-                      className={css({
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        display: "block",
-                      })}
-                    />
-                  </a>
-                </Link>
-              </div>
+                    {article.title}
+                  </h2>
+                  <img
+                    {...article.image}
+                    src={`${article.image?.src}?fm=webp&w=1200`}
+                    loading="lazy"
+                    className={css({
+                      position: "absolute",
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    })}
+                  />
+                </a>
+              </Link>
             </Fragment>
           );
         })}
