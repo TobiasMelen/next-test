@@ -1,5 +1,6 @@
 import { css } from "goober";
 import { GetStaticProps } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useRef, useState } from "react";
 import {
@@ -157,9 +158,9 @@ export default function Home({ articles }: Props) {
                     padding: 0,
                     margin: 0,
                     listStyle: "none",
-                    height: "100vh",
-                    maxHeight: "-webkit-fill-available",
-                    width: "100vw",
+                    height: "100%",
+                    //maxHeight: "-webkit-fill-available",
+                    width: "100%",
                     flexShrink: 0,
                     display: "flex",
                     justifyContent: `flex-${index % 2 === 0 ? "start" : "end"}`,
@@ -168,32 +169,46 @@ export default function Home({ articles }: Props) {
                   })}
                 >
                   <h2
-                    className={css({
-                      margin: "0.25em",
-                      zIndex: 2,
-                      color: fontColors[index % fontColors.length],
-                      WebkitTextStroke: ".6vmin black",
-                      fontSize: "13vmin",
-                      fontWeight: 900,
-                      textTransform: "uppercase",
-                      fontStyle: "italic",
-                      letterSpacing: "2px",
-                      opacity: article.slug === currentScreen ? 1 : 0,
-                      transform: `translateX(${
-                        article.slug === currentScreen
+                    className={css`
+                      margin: 0.5em;
+                      z-index: 2;
+                      color: ${fontColors[index % fontColors.length]};
+                      -webkit-text-stroke: 0.6vmin black;
+                      font-size: 13vmin;
+                      font-weight: 900;
+                      text-transform: uppercase;
+                      font-style: italic;
+                      line-height: 1;
+                      opacity: ${article.slug === currentScreen ? 1 : 0};
+                      transform: translateX(
+                        ${article.slug === currentScreen
                           ? "0"
-                          : `${index % 2 === 0 ? "-" : ""}75%`
-                      })`,
-                      transition: "transform 350ms ease-out, opacity 350ms",
-                      transitionDelay: "175ms",
-                    })}
+                          : `${index % 2 === 0 ? "-" : ""}75%`}
+                      );
+                      transition: transform 350ms ease-out, opacity 350ms;
+                      transition-delay: 175ms;
+                      &::after {
+                        content: "";
+                        display: block;
+                        border: 0.6vmin black solid;
+                        background-color: ${fontColors[
+                          index % fontColors.length
+                        ]};
+                        padding: 1vmin;
+                        transform: skewX(-12deg);
+                        width: 93%;
+                        margin-left: -1vmin;
+                      }
+                    `}
                   >
                     {article.title}
                   </h2>
-                  <img
-                    {...article.image}
-                    src={`${article.image?.src}?fm=webp&w=1200`}
-                    loading="lazy"
+                  <Image
+                    alt={article.title}
+                    loading="eager"
+                    quality="50"
+                    layout="fill"
+                    src={`${article.image?.src}`}
                     className={css({
                       position: "absolute",
                       width: "100%",
