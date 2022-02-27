@@ -186,7 +186,15 @@ export default function Home({ articles }: Props) {
                         fontWeight: 900,
                         textTransform: "uppercase",
                         fontStyle: "italic",
-                        letterSpacing: "1.1",
+                        letterSpacing: "2px",
+                        opacity: article.slug === currentScreen ? 1 : 0, 
+                        transform: `translateX(${
+                          article.slug === currentScreen
+                            ? "0"
+                            : `${index % 2 === 0 ? "-" : ""}75%`
+                        })`,
+                        transition: "transform 350ms ease-out, opacity 350ms",
+                        transitionDelay: "175ms",
                       })}
                     >
                       {article.title}
