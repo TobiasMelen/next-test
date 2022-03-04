@@ -118,13 +118,17 @@ export default function Home({ articles }: Props) {
             key={slug + index}
             className={css`
               margin: 2vmin 0;
-              padding: 0.4vmin;
-              background-color: black;
+              padding: 0.6vmin;
+              border: black 0.3vmin solid;
               border-radius: 50%;
-              transition: box-shadow 500ms;
-              box-shadow: ${currentScreen === slug
-                ? `0 0 0 .9vmin deepskyblue`
-                : `none`};
+              transition: background-color 300ms, transform 300ms;
+              background-color: ${currentScreen === slug
+                ? index % 2
+                  ? "hotpink"
+                  : "deepskyblue"
+                : `transparent`};
+              transform: scale(${currentScreen === slug ? "1.4" : "1"});
+              transition-timing-function: ${currentScreen === slug ? "ease-in" : "ease-out"};
             `}
             onClick={() =>
               listRef.current
