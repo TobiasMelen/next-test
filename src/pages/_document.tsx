@@ -28,6 +28,7 @@ export default class MyDocument extends Document<{ css: string }> {
         </Head>
         <body>
           <Main />
+          <script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js" />
           <NextScript />
         </body>
       </Html>

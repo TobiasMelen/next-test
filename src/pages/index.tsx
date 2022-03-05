@@ -9,6 +9,7 @@ import {
   imageProps,
   ImageProps,
 } from "../contentful";
+import Screen from "../components/Screen";
 
 type Props = {
   title: string;
@@ -128,7 +129,9 @@ export default function Home({ articles }: Props) {
                   : "deepskyblue"
                 : `transparent`};
               transform: scale(${currentScreen === slug ? "1.4" : "1"});
-              transition-timing-function: ${currentScreen === slug ? "ease-in" : "ease-out"};
+              transition-timing-function: ${currentScreen === slug
+                ? "ease-in"
+                : "ease-out"};
             `}
             onClick={() =>
               listRef.current
@@ -142,96 +145,18 @@ export default function Home({ articles }: Props) {
       {[articles[articles.length - 1]]
         .concat(articles)
         .concat(articles[0])
-        .map((article, index) => {
-          return (
-            <Fragment key={article.slug + index}>
-              <div
-                data-screen={article.slug}
-                className={css({
-                  height: 0,
-                  scrollSnapStop: "always",
-                  scrollSnapAlign: "start",
-                })}
-              ></div>
-              <Link href={`/${article.slug}`}>
-                <a
-                  className={css({
-                    position: "sticky",
-                    left: 0,
-                    top: 0,
-                    padding: 0,
-                    margin: 0,
-                    listStyle: "none",
-                    height: "100%",
-                    //maxHeight: "-webkit-fill-available",
-                    width: "100%",
-                    flexShrink: 0,
-                    display: "flex",
-                    justifyContent: `flex-${index % 2 === 0 ? "start" : "end"}`,
-                    alignItems: "flex-end",
-                    background: "#DDD",
-                  })}
-                >
-                  <h2
-                    className={css`
-                      margin: 0.5em;
-                      z-index: 2;
-                      color: ${fontColors[index % fontColors.length]};
-                      -webkit-text-stroke: 0.6vmin black;
-                      font-size: 13vmin;
-                      font-weight: 900;
-                      text-transform: uppercase;
-                      font-style: italic;
-                      line-height: 1;
-                      opacity: ${article.slug === currentScreen ? 1 : 0};
-                      transform: translateX(
-                        ${article.slug === currentScreen
-                          ? "0"
-                          : `${index % 2 === 0 ? "-" : ""}75%`}
-                      );
-                      transition: transform 350ms ease-out, opacity 350ms;
-                      transition-delay: 175ms;
-                      &::after {
-                        content: "";
-                        display: block;
-                        border: 0.6vmin black solid;
-                        background-color: ${fontColors[
-                          index % fontColors.length
-                        ]};
-                        padding: 1vmin;
-                        transform: skewX(-12deg);
-                        width: 93%;
-                        margin-left: -1vmin;
-                      }
-                    `}
-                  >
-                    {article.title}
-                  </h2>
-                  <Image
-                    alt={article.title}
-                    loading="eager"
-                    quality="50"
-                    layout="fill"
-                    src={`${article.image?.src}`}
-                    className={css({
-                      position: "absolute",
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    })}
-                  />
-                </a>
-              </Link>
-            </Fragment>
-          );
-        })}
+        .map((article, index) => (
+          <Screen
+            article={article}
+            key={`${article.slug}/${index}`}
+            current={article.slug === currentScreen}
+            color={index % 2 === 0 ? "hotpink" : "deepskyblue"}
+          />
+        ))}
       <div style={{ height: 0 }} data-scrollmarker={"bottom"} />
     </main>
   );
 }
-
-const fontColors = ["hotpink", "DeepSkyBlue"];
 
 export const getStaticProps: GetStaticProps<Props, {}> = async ({
   preview = false,
