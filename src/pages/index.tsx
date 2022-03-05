@@ -94,6 +94,7 @@ export default function Home({ articles }: Props) {
         overflow-x: auto;
         scroll-snap-type: y mandatory;
         scrollbar-width: none;
+        scroll-behavior: smooth;
         &::-webkit-scrollbar {
           -webkit-appearance: none;
           width: 0;
